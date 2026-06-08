@@ -20,13 +20,14 @@ Public API:
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 
 import networkx as nx
 
 _DIR = Path(__file__).resolve().parent
 _SRC = _DIR / "epwocd.cpp"
-_BIN = _DIR / "epwocd"
+_BIN = _DIR / ("epwocd.exe" if sys.platform.startswith("win") else "epwocd")
 
 
 def _ensure_built() -> Path:
@@ -35,10 +36,14 @@ def _ensure_built() -> Path:
         return _BIN
     if not _SRC.exists():
         raise FileNotFoundError(f"Missing EP-WOCD source: {_SRC}")
-    subprocess.run(
+    proc = subprocess.run(
         ["g++", "-O2", "-std=c++17", "-o", str(_BIN), str(_SRC)],
-        check=True,
+        capture_output=True,
+        text=True,
     )
+    if proc.returncode != 0:
+        detail = (proc.stderr or proc.stdout or "no compiler output").strip()
+        raise RuntimeError(f"Failed to compile {_SRC.name} with g++: {detail}")
     return _BIN
 
 

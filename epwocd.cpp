@@ -666,7 +666,7 @@ void updateLocation(vector<int> &l, int t, vector<int> &dk, vector<int> &lk) {
     } else {
         uniform_real_distribution<double> disl(-1, 1);
         double ll = disl(gen);
-        double r = abs(cos(2 * M_PI * ll));
+        double r = abs(cos(2 * 3.141592653589793 * ll));
 
         if (dis(gen) < rateMimicElist) target = &xBest;
         else {
